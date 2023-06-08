@@ -32,7 +32,6 @@ public class SnakeGame extends Application {
         AnchorPane anchorPane = new AnchorPane(menuInitializer.getBackgroundWallpaper());
         Scene mainScene = new Scene(anchorPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-
         anchorPane.getChildren().add(menuInitializer.getButtonArea());
 
         initStage(stage, mainScene);

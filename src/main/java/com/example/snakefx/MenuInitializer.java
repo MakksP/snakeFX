@@ -1,6 +1,7 @@
 package com.example.snakefx;
 
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -11,36 +12,51 @@ public class MenuInitializer {
 
     public static final int WINDOW_WIDTH = 1920;
     public static final int WINDOW_HEIGHT = 1080;
+    public static final int ADDITIONAL_OFFSET = 60;
 
     private final ImageView backgroundWallpaper;
     private final GridPane buttonArea;
 
     public MenuInitializer(){
-        backgroundWallpaper = initBackgroundImage();
+        backgroundWallpaper = initImage("/snake/snakeMenu.png");
         buttonArea = initButtonGridPane();
         addButtonsToButtonArea(buttonArea);
     }
 
-    public static void addButtonsToButtonArea(GridPane buttonArea) {
-        Button playButton = new Button("Graj");
-        Button exitButton = new Button("Wyjdź");
+
+    public void addButtonsToButtonArea(GridPane buttonArea) {
+        MenuButton playButton = new MenuButton();
+        MenuButton exitButton = new MenuButton();
+
+        ImageView playButtonImage = initImage("/snake/playButtonDefault.png");
+        setButtonStyle(playButton, playButtonImage);
+
+        ImageView exitGameButtonImage = initImage("/snake/exitButtonDefault.png");
+        setButtonStyle(exitButton, exitGameButtonImage);
+
         buttonArea.add(playButton, 0, 0);
         buttonArea.add(exitButton, 0, 1);
+    }
+
+    private static void setButtonStyle(Button button, ImageView buttonImage) {
+        button.setGraphic(buttonImage);
+        button.setStyle("-fx-background-color: transparent; -fx-border-width: 2px; -fx-border-style: solid; -fx-padding: 0;");
+        button.setFocusTraversable(false);
     }
 
     public static GridPane initButtonGridPane() {
         GridPane buttonArea = new GridPane();
         buttonArea.setVgap(50);
-        buttonArea.setLayoutX((double) WINDOW_WIDTH/2);
-        buttonArea.setLayoutY((double) WINDOW_HEIGHT/2);
+        buttonArea.setLayoutX((double) WINDOW_WIDTH/2 - ADDITIONAL_OFFSET);
+        buttonArea.setLayoutY((double) WINDOW_HEIGHT/2 - ADDITIONAL_OFFSET);
         return buttonArea;
     }
 
-    public ImageView initBackgroundImage() {
-        InputStream imageStream = getClass().getResourceAsStream("/snake/snakeMenu.png");
-        Image backgroundImage = new Image(imageStream);
-        ImageView backgroundWallpaper = new ImageView(backgroundImage);
-        return backgroundWallpaper;
+    public ImageView initImage(String path) {
+        InputStream imageStream = getClass().getResourceAsStream(path);
+        Image Image = new Image(imageStream);
+        ImageView imageView = new ImageView(Image);
+        return imageView;
     }
 
     public ImageView getBackgroundWallpaper() {
