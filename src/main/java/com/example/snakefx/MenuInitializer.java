@@ -1,10 +1,14 @@
 package com.example.snakefx;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 import java.io.InputStream;
 
@@ -13,6 +17,7 @@ public class MenuInitializer {
     public static final int WINDOW_WIDTH = 1920;
     public static final int WINDOW_HEIGHT = 1080;
     public static final int ADDITIONAL_OFFSET = 60;
+    public static final int DEFAULT_BUTTONS_GAP = 50;
 
     private final ImageView backgroundWallpaper;
     private final GridPane buttonArea;
@@ -31,12 +36,11 @@ public class MenuInitializer {
         ImageView playButtonHoverImage = initImage("/snake/playButtonHover.png");
         ImageView exitButtonHoverImage = initImage("/snake/exitButtonHover.png");
 
-        MenuButton playButton = new MenuButton(playButtonHoverImage, playButtonDefaultImage);
-        MenuButton exitButton = new MenuButton(exitButtonHoverImage, exitGameButtonDefaultImage);
+        MenuButton playButton = new MenuButton(playButtonHoverImage, playButtonDefaultImage, buttonArea);
+        MenuButton exitButton = new MenuButton(exitButtonHoverImage, exitGameButtonDefaultImage, buttonArea);
 
 
         setButtonStyle(playButton, playButtonDefaultImage);
-
 
         setButtonStyle(exitButton, exitGameButtonDefaultImage);
 
@@ -52,9 +56,11 @@ public class MenuInitializer {
 
     public static GridPane initButtonGridPane() {
         GridPane buttonArea = new GridPane();
-        buttonArea.setVgap(50);
+        buttonArea.setVgap(DEFAULT_BUTTONS_GAP);
         buttonArea.setLayoutX((double) WINDOW_WIDTH/2 - ADDITIONAL_OFFSET);
         buttonArea.setLayoutY((double) WINDOW_HEIGHT/2 - ADDITIONAL_OFFSET);
+        buttonArea.setPrefWidth(200);
+        buttonArea.setAlignment(Pos.CENTER);
         return buttonArea;
     }
 
