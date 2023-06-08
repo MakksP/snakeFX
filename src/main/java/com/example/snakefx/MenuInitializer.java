@@ -36,8 +36,8 @@ public class MenuInitializer {
         ImageView playButtonHoverImage = initImage("/snake/playButtonHover.png");
         ImageView exitButtonHoverImage = initImage("/snake/exitButtonHover.png");
 
-        MenuButton playButton = new MenuButton(playButtonHoverImage, playButtonDefaultImage, buttonArea);
-        MenuButton exitButton = new MenuButton(exitButtonHoverImage, exitGameButtonDefaultImage, buttonArea);
+        MenuButton playButton = new MenuButton(playButtonHoverImage, playButtonDefaultImage, buttonArea, ButtonType.PLAY);
+        MenuButton exitButton = new MenuButton(exitButtonHoverImage, exitGameButtonDefaultImage, buttonArea, ButtonType.EXIT);
 
 
         setButtonStyle(playButton, playButtonDefaultImage);
@@ -50,7 +50,7 @@ public class MenuInitializer {
 
     private static void setButtonStyle(Button button, ImageView buttonImage) {
         button.setGraphic(buttonImage);
-        button.setStyle("-fx-background-color: transparent; -fx-border-width: 2px; -fx-border-style: solid; -fx-padding: 0;");
+        button.setStyle("-fx-background-color: transparent; -fx-border-width: 2px; -fx-border-style: solid; -fx-padding: 0; -fx-border-color: red");
         button.setFocusTraversable(false);
     }
 
