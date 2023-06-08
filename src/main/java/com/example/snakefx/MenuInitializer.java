@@ -25,14 +25,20 @@ public class MenuInitializer {
 
 
     public void addButtonsToButtonArea(GridPane buttonArea) {
-        MenuButton playButton = new MenuButton();
-        MenuButton exitButton = new MenuButton();
+        ImageView playButtonDefaultImage = initImage("/snake/playButtonDefault.png");
+        ImageView exitGameButtonDefaultImage = initImage("/snake/exitButtonDefault.png");
 
-        ImageView playButtonImage = initImage("/snake/playButtonDefault.png");
-        setButtonStyle(playButton, playButtonImage);
+        ImageView playButtonHoverImage = initImage("/snake/playButtonHover.png");
+        ImageView exitButtonHoverImage = initImage("/snake/exitButtonHover.png");
 
-        ImageView exitGameButtonImage = initImage("/snake/exitButtonDefault.png");
-        setButtonStyle(exitButton, exitGameButtonImage);
+        MenuButton playButton = new MenuButton(playButtonHoverImage, playButtonDefaultImage);
+        MenuButton exitButton = new MenuButton(exitButtonHoverImage, exitGameButtonDefaultImage);
+
+
+        setButtonStyle(playButton, playButtonDefaultImage);
+
+
+        setButtonStyle(exitButton, exitGameButtonDefaultImage);
 
         buttonArea.add(playButton, 0, 0);
         buttonArea.add(exitButton, 0, 1);
