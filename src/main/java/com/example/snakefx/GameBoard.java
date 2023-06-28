@@ -6,7 +6,9 @@ import java.util.List;
 public class GameBoard {
     private static GameBoard instance;
     private List<List<GameElement>> gameMap;
-    private final int mapSize = 40;
+    private final int mapWidth = 40;
+    private final int mapHeight = 20;
+    private Snake player;
 
     private GameBoard(){
         gameMap = new ArrayList<>();
@@ -21,18 +23,29 @@ public class GameBoard {
         return instance;
     }
 
-    private void createMap() {
-        for (int i = 0; i < mapSize; i++){
+    public void createMap() {
+        for (int i = 0; i < mapHeight; i++){
             gameMap.add(new ArrayList<>());
         }
     }
 
-    private void fillMap(){
-        for (int i = 0; i < mapSize; i++){
-            for (int j = 0; j < mapSize; j++) {
-                gameMap.get(i).set(j, GameElement.EMPTY);
+    public void fillMap(){
+        for (int i = 0; i < mapHeight; i++){
+            for (int j = 0; j < mapWidth; j++) {
+                gameMap.get(i).add(j, GameElement.EMPTY);
             }
         }
     }
 
+    public List<List<GameElement>> getGameMap(){
+        return gameMap;
+    }
+
+    public void createPlayer(){
+        player = new Snake();
+    }
+
+    public Snake getPlayer() {
+        return player;
+    }
 }

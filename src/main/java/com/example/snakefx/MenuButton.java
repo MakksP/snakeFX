@@ -4,10 +4,9 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class MenuButton extends Button {
-    public static final int EXTRA_GAP = 18;
-    public static final int DEFAULT_BUTTONS_GAP = 50;
     private final ImageView hoverImage;
     private final ImageView defaultImage;
     private final GridPane buttonArea;
@@ -31,7 +30,7 @@ public class MenuButton extends Button {
         });
         if (buttonType == ButtonType.PLAY){
             setOnMouseClicked(mouseEvent -> {
-
+                GameInitializer game = new GameInitializer((Stage) this.getScene().getWindow());
             });
         } else if (buttonType == ButtonType.EXIT){
             setOnMouseClicked(mouseEvent -> {
