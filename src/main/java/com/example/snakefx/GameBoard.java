@@ -17,7 +17,7 @@ public class GameBoard {
     public static GameBoard getInstance() {
         if (instance == null)
             instance = new GameBoard();
-            
+
         return instance;
     }
 

@@ -20,14 +20,14 @@ public class MenuButton extends Button {
         this.buttonArea = buttonArea;
         this.buttonType = buttonType;
         setOnMouseEntered(mouseEvent -> {
-            setImage(hoverImage);
-            buttonArea.setVgap(buttonArea.getVgap() - EXTRA_GAP);
+            this.setScaleX(1.2);
+            this.setScaleY(1.2);
             this.setCursor(Cursor.HAND);
         });
 
         setOnMouseExited(mouseEvent -> {
-            setImage(defaultImage);
-            buttonArea.setVgap(DEFAULT_BUTTONS_GAP);
+            this.setScaleX(1);
+            this.setScaleY(1);
         });
         if (buttonType == ButtonType.PLAY){
             setOnMouseClicked(mouseEvent -> {
