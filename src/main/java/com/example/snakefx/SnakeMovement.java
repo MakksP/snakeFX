@@ -1,10 +1,15 @@
 package com.example.snakefx;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class SnakeMovement {
     private GameBoard board;
     private GridPane gameLayout;
+    private Scene gameScene;
     private static final int CHECK_HEAD = 1;
     private static final int ELEMENT_DOWN = 1;
     private static final int ELEMENT_UP = 1;
@@ -22,47 +28,65 @@ public class SnakeMovement {
     private final int periodOfTime = 800;
     private final int snakeIndexInGridPane = 800;
 
-    public SnakeMovement(GameBoard board, GridPane gameLayout){
+    public SnakeMovement(GameBoard board, GridPane gameLayout, Scene gameScene){
         this.board = board;
         this.gameLayout = gameLayout;
+        this.gameScene = gameScene;
 
-        ScheduledExecutorService scheduleMove = new ScheduledThreadPoolExecutor(1);
-        scheduleMove.scheduleAtFixedRate(() -> {
-                try {
-                    Thread.sleep(periodOfTime);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+
+        Timeline scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
+            Platform.runLater(() -> {
+                clearSnakeFromGridPane();
+            });
+            int oldHeadX = board.getPlayer().getHeadXCord();
+            int oldHeadY = board.getPlayer().getHeadYCord();
+
+            int oldTailY = 0, oldTailX = 0;
+            for (List<GameElement> elements : board.getGameMap()){
+                oldTailX = elements.indexOf(GameElement.SNAKE_TAIL);
+                if (oldTailX != -1){
+                    break;
                 }
-                Platform.runLater(() -> {
-                    clearSnakeFromGridPane();
-                });
-                int oldHeadX = board.getPlayer().getHeadXCord();
-                int oldHeadY = board.getPlayer().getHeadYCord();
+                oldTailY++;
 
-                int oldTailY = 0, oldTailX = 0;
-                for (List<GameElement> elements : board.getGameMap()){
-                    oldTailX = elements.indexOf(GameElement.SNAKE_TAIL);
-                    if (oldTailX != -1){
-                        break;
-                    }
-                    oldTailY++;
+            }
+            moveTail(board, oldTailY, oldTailX);
+            serveHeadMove(board, oldHeadX, oldHeadY);
+            Platform.runLater(() -> {
+                drawPlayer();
+            });
 
-                }
+        }));
+        scheduleMove.setCycleCount(Timeline.INDEFINITE);
+        scheduleMove.play();
 
-                if (board.getPlayer().getDirection() == MoveDirection.UP){
-                    moveHeadUp(board, oldHeadX, oldHeadY);
-                    moveTail(board, oldTailY, oldTailX);
+        this.gameScene.setOnKeyPressed(keyEvent -> {
+            KeyCode button = keyEvent.getCode();
+            Snake player = board.getPlayer();
+            if (button == KeyCode.UP && player.getDirection() != MoveDirection.DOWN) {
+                player.setDirection(MoveDirection.UP);
+            } else if (button == KeyCode.DOWN && player.getDirection() != MoveDirection.UP) {
+                player.setDirection(MoveDirection.DOWN);
+            } else if (button == KeyCode.LEFT && player.getDirection() != MoveDirection.RIGHT) {
+                player.setDirection(MoveDirection.LEFT);
+            } else if (button == KeyCode.RIGHT && player.getDirection() != MoveDirection.LEFT) {
+                player.setDirection(MoveDirection.RIGHT);
+            }
+        });
 
-                }
-                Platform.runLater(() -> {
-                    drawPlayer();
-                });
+    }
 
-        }, 0, periodOfTime, TimeUnit.MILLISECONDS);
+    private static void serveHeadMove(GameBoard board, int oldHeadX, int oldHeadY) {
+        if (board.getPlayer().getDirection() == MoveDirection.UP){
+            moveHeadUp(board, oldHeadX, oldHeadY);
 
-
-
-
+        } else if (board.getPlayer().getDirection() == MoveDirection.DOWN){
+            moveHeadDown(board, oldHeadX, oldHeadY);
+        } else if (board.getPlayer().getDirection() == MoveDirection.LEFT){
+            moveHeadLeft(board, oldHeadX, oldHeadY);
+        } else if (board.getPlayer().getDirection() == MoveDirection.RIGHT){
+            moveHeadRight(board, oldHeadX, oldHeadY);
+        }
     }
 
     private static void moveTail(GameBoard board, Integer oldTailY, Integer oldTailX) {
@@ -78,18 +102,22 @@ public class SnakeMovement {
     }
 
     private static void moveTailLeft(GameBoard board, Integer oldTailY, Integer oldTailX) {
+        board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
         board.getGameMap().get(oldTailY).set(oldTailX - 1, GameElement.SNAKE_TAIL);
     }
 
     private static void moveTailRight(GameBoard board, Integer oldTailY, Integer oldTailX) {
+        board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
         board.getGameMap().get(oldTailY).set(oldTailX + 1, GameElement.SNAKE_TAIL);
     }
 
     private static void moveTailUp(GameBoard board, Integer oldTailY, Integer oldTailX) {
+        board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
         board.getGameMap().get(oldTailY - 1).set(oldTailX, GameElement.SNAKE_TAIL);
     }
 
     private static void moveTailDown(GameBoard board, Integer oldTailY, Integer oldTailX) {
+        board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
         board.getGameMap().get(oldTailY + 1).set(oldTailX, GameElement.SNAKE_TAIL);
     }
 
@@ -97,6 +125,24 @@ public class SnakeMovement {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
         board.getGameMap().get(oldHeadY - 1).set(oldHeadX, GameElement.SNAKE_HEAD);
         board.getPlayer().setHeadYCord(oldHeadY - 1);
+    }
+
+    private static void moveHeadDown(GameBoard board, int oldHeadX, int oldHeadY) {
+        board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
+        board.getGameMap().get(oldHeadY + 1).set(oldHeadX, GameElement.SNAKE_HEAD);
+        board.getPlayer().setHeadYCord(oldHeadY + 1);
+    }
+
+    private static void moveHeadLeft(GameBoard board, int oldHeadX, int oldHeadY) {
+        board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
+        board.getGameMap().get(oldHeadY).set((oldHeadX - 1), GameElement.SNAKE_HEAD);
+        board.getPlayer().setHeadXCord(oldHeadX - 1);
+    }
+
+    private static void moveHeadRight(GameBoard board, int oldHeadX, int oldHeadY) {
+        board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
+        board.getGameMap().get(oldHeadY).set((oldHeadX + 1), GameElement.SNAKE_HEAD);
+        board.getPlayer().setHeadXCord(oldHeadX + 1);
     }
 
 
@@ -107,7 +153,6 @@ public class SnakeMovement {
 
     public void drawPlayer(){
         MoveDirection direction = board.getPlayer().getDirection();
-
         ImageView head = generateSnakePart("/snake/snakeHead.png");
 
 
