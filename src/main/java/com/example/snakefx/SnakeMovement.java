@@ -26,7 +26,6 @@ public class SnakeMovement {
     private static final int ELEMENT_UP = 1;
     private static final int ELEMENT_LEFT = 1;
     private final int periodOfTime = 800;
-    private final int snakeIndexInGridPane = 800;
 
     public SnakeMovement(GameBoard board, GridPane gameLayout, Scene gameScene){
         this.board = board;
@@ -41,20 +40,9 @@ public class SnakeMovement {
             int oldHeadX = board.getPlayer().getHeadXCord();
             int oldHeadY = board.getPlayer().getHeadYCord();
 
-            int oldTailY = 0, oldTailX = 0;
-            for (List<GameElement> elements : board.getGameMap()){
-                oldTailX = elements.indexOf(GameElement.SNAKE_TAIL);
-                if (oldTailX != -1){
-                    break;
-                }
-                oldTailY++;
-
-            }
-            moveTail(board, oldTailY, oldTailX);
-            serveHeadMove(board, oldHeadX, oldHeadY);
-            Platform.runLater(() -> {
-                drawPlayer();
-            });
+            Pair tailCords = new Pair(0, 0);
+            findTailCords(board, tailCords);
+            moveAndDraw(board, oldHeadX, oldHeadY, tailCords.getY(), tailCords.getX());
 
         }));
         scheduleMove.setCycleCount(Timeline.INDEFINITE);
@@ -63,17 +51,49 @@ public class SnakeMovement {
         this.gameScene.setOnKeyPressed(keyEvent -> {
             KeyCode button = keyEvent.getCode();
             Snake player = board.getPlayer();
+            Pair tailCords = new Pair(0, 0);
+            findTailCords(board, tailCords);
+            Platform.runLater(() -> {
+                clearSnakeFromGridPane();
+            });
             if (button == KeyCode.UP && player.getDirection() != MoveDirection.DOWN) {
                 player.setDirection(MoveDirection.UP);
+                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+
             } else if (button == KeyCode.DOWN && player.getDirection() != MoveDirection.UP) {
                 player.setDirection(MoveDirection.DOWN);
+                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+
             } else if (button == KeyCode.LEFT && player.getDirection() != MoveDirection.RIGHT) {
                 player.setDirection(MoveDirection.LEFT);
+                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+
             } else if (button == KeyCode.RIGHT && player.getDirection() != MoveDirection.LEFT) {
                 player.setDirection(MoveDirection.RIGHT);
+                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+                
             }
         });
 
+    }
+
+    private static void findTailCords(GameBoard board, Pair tailCords) {
+        for (List<GameElement> elements : board.getGameMap()){
+            tailCords.setX(elements.indexOf(GameElement.SNAKE_TAIL));
+            if (tailCords.getX() != -1){
+                break;
+            }
+            tailCords.setY(tailCords.getY() + 1);
+
+        }
+    }
+
+    private void moveAndDraw(GameBoard board, int oldHeadX, int oldHeadY, int oldTailY, int oldTailX) {
+        moveTail(board, oldTailY, oldTailX);
+        serveHeadMove(board, oldHeadX, oldHeadY);
+        Platform.runLater(() -> {
+            drawPlayer();
+        });
     }
 
     private static void serveHeadMove(GameBoard board, int oldHeadX, int oldHeadY) {
