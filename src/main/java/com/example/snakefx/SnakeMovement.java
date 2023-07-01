@@ -16,12 +16,12 @@ import java.util.List;
 
 
 public class SnakeMovement {
-    private GameBoard board;
-    private GridPane gameLayout;
+    private final GameBoard board;
+    private final GridPane gameLayout;
     private Scene gameScene;
     private final int CHECK_HEAD = 1;
     private final int periodOfTime = 800;
-    private Checker snakeElementsChecker;
+    private final Checker snakeElementsChecker;
 
     public SnakeMovement(GameBoard board, GridPane gameLayout, Scene gameScene){
         this.board = board;
@@ -109,46 +109,54 @@ public class SnakeMovement {
 
     private void moveTailLeft(GameBoard board, Integer oldTailY, Integer oldTailX) {
         board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
-        board.getGameMap().get(oldTailY).set(oldTailX - 1, GameElement.SNAKE_TAIL);
+        int newTailX = snakeElementsChecker.getNewSnakeElementPositionGoLeft(oldTailX);
+        board.getGameMap().get(oldTailY).set(newTailX, GameElement.SNAKE_TAIL);
     }
 
     private void moveTailRight(GameBoard board, Integer oldTailY, Integer oldTailX) {
         board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
-        board.getGameMap().get(oldTailY).set(oldTailX + 1, GameElement.SNAKE_TAIL);
+        int newTailX = snakeElementsChecker.getNewSnakeElementPositionGoRight(oldTailX);
+        board.getGameMap().get(oldTailY).set(newTailX, GameElement.SNAKE_TAIL);
     }
 
     private void moveTailUp(GameBoard board, Integer oldTailY, Integer oldTailX) {
         board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
-        board.getGameMap().get(oldTailY - 1).set(oldTailX, GameElement.SNAKE_TAIL);
+        int newTailY = snakeElementsChecker.getNewSnakeElementPositionGoUp(oldTailY);
+        board.getGameMap().get(newTailY).set(oldTailX, GameElement.SNAKE_TAIL);
     }
 
     private void moveTailDown(GameBoard board, Integer oldTailY, Integer oldTailX) {
         board.getGameMap().get(oldTailY).set(oldTailX, GameElement.EMPTY);
-        board.getGameMap().get(oldTailY + 1).set(oldTailX, GameElement.SNAKE_TAIL);
+        int newTailY = snakeElementsChecker.getNewSnakeElementPositionGoDown(oldTailY);
+        board.getGameMap().get(newTailY).set(oldTailX, GameElement.SNAKE_TAIL);
     }
 
     private void moveHeadUp(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
-        board.getGameMap().get(oldHeadY - 1).set(oldHeadX, GameElement.SNAKE_HEAD);
-        board.getPlayer().setHeadYCord(oldHeadY - 1);
+        int newHeadY = snakeElementsChecker.getNewSnakeElementPositionGoUp(oldHeadY);
+        board.getGameMap().get(newHeadY).set(oldHeadX, GameElement.SNAKE_HEAD);
+        board.getPlayer().setHeadYCord(newHeadY);
     }
 
     private void moveHeadDown(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
-        board.getGameMap().get(oldHeadY + 1).set(oldHeadX, GameElement.SNAKE_HEAD);
-        board.getPlayer().setHeadYCord(oldHeadY + 1);
+        int newHeadY = snakeElementsChecker.getNewSnakeElementPositionGoDown(oldHeadY);
+        board.getGameMap().get(newHeadY).set(oldHeadX, GameElement.SNAKE_HEAD);
+        board.getPlayer().setHeadYCord(newHeadY);
     }
 
     private void moveHeadLeft(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
-        board.getGameMap().get(oldHeadY).set((oldHeadX - 1), GameElement.SNAKE_HEAD);
-        board.getPlayer().setHeadXCord(oldHeadX - 1);
+        int newHeadX = snakeElementsChecker.getNewSnakeElementPositionGoLeft(oldHeadX);
+        board.getGameMap().get(oldHeadY).set((newHeadX), GameElement.SNAKE_HEAD);
+        board.getPlayer().setHeadXCord(newHeadX);
     }
 
     private void moveHeadRight(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
-        board.getGameMap().get(oldHeadY).set((oldHeadX + 1), GameElement.SNAKE_HEAD);
-        board.getPlayer().setHeadXCord(oldHeadX + 1);
+        int newHeadX = snakeElementsChecker.getNewSnakeElementPositionGoRight(oldHeadX);
+        board.getGameMap().get(oldHeadY).set((newHeadX), GameElement.SNAKE_HEAD);
+        board.getPlayer().setHeadXCord(newHeadX);
     }
 
 
@@ -160,7 +168,6 @@ public class SnakeMovement {
     public void drawPlayer(){
         MoveDirection direction = board.getPlayer().getDirection();
         ImageView head = generateSnakePart("/snake/snakeHead.png");
-
 
         ImageView node = generateSnakePart("/snake/snakeNode.png");
 
@@ -185,7 +192,6 @@ public class SnakeMovement {
         }
     }
 
-
     private void findNodesTailPositionAndDraw(ImageView node, ImageView tail, int consideredPartX, int consideredPartY) {
         ImageView element;
         for (int i = 0; i < board.getPlayer().getLevel() + CHECK_HEAD; i++) {
@@ -195,18 +201,18 @@ public class SnakeMovement {
                 element = tail;
             }
             if (snakeElementsChecker.nodeIsUnder(consideredPartX, consideredPartY)){
-                consideredPartY++;
+                consideredPartY = snakeElementsChecker.getNewSnakeElementPositionGoDown(consideredPartY);
                 gameLayout.add(element, consideredPartX, consideredPartY);
                 element.setRotate(270);
             } else if (snakeElementsChecker.nodeIsAbove(consideredPartX, consideredPartY)){
-                consideredPartY--;
+                consideredPartY = snakeElementsChecker.getNewSnakeElementPositionGoUp(consideredPartY);
                 gameLayout.add(element, consideredPartX, consideredPartY);
                 element.setRotate(90);
             } else if (snakeElementsChecker.nodeIsLeft(consideredPartX, consideredPartY)){
-                consideredPartX--;
+                consideredPartX = snakeElementsChecker.getNewSnakeElementPositionGoLeft(consideredPartX);
                 gameLayout.add(element, consideredPartX, consideredPartY);
             } else{
-                consideredPartX++;
+                consideredPartX = snakeElementsChecker.getNewSnakeElementPositionGoRight(consideredPartX);
                 gameLayout.add(element, consideredPartX, consideredPartY);
                 element.setRotate(180);
             }
