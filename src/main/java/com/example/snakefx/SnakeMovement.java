@@ -3,16 +3,10 @@ package com.example.snakefx;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class SnakeMovement {
@@ -21,18 +15,18 @@ public class SnakeMovement {
     private Scene gameScene;
     private final int periodOfTime = 800;
     private final Checker snakeElementsChecker;
-    private final Draw drawSnake;
+    private final Draw drawElement;
 
-    public SnakeMovement(GameBoard board, GridPane gameLayout, Scene gameScene, Checker snakeElementsChecker, Draw drawSnake){
+    public SnakeMovement(GameBoard board, GridPane gameLayout, Scene gameScene, Checker snakeElementsChecker, Draw drawElement){
         this.board = board;
         this.gameLayout = gameLayout;
         this.gameScene = gameScene;
         this.snakeElementsChecker = snakeElementsChecker;
-        this.drawSnake = drawSnake;
+        this.drawElement = drawElement;
 
         Timeline scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
             Platform.runLater(() -> {
-                drawSnake.clearSnakeFromGridPane();
+                drawElement.clearSnakeFromGridPane();
             });
             int oldHeadX = board.getPlayer().getHeadXCord();
             int oldHeadY = board.getPlayer().getHeadYCord();
@@ -73,26 +67,32 @@ public class SnakeMovement {
 
     private void moveAndDraw(GameBoard board, int oldHeadX, int oldHeadY, int oldTailY, int oldTailX) {
         Platform.runLater(() -> {
-            drawSnake.clearSnakeFromGridPane();
+            drawElement.clearSnakeFromGridPane();
         });
         moveTail(board, oldTailY, oldTailX);
-        serveHeadMove(board, oldHeadX, oldHeadY);
+        Pair appleCords = serveHeadMove(board, oldHeadX, oldHeadY);
         Platform.runLater(() -> {
-            drawSnake.drawPlayer();
+            drawElement.drawPlayer();
+            if (!appleCords.nothingHappened()){
+                drawElement.clearAppleFromGridPane();
+                drawElement.drawAppleInRandomPlace();
+            }
         });
     }
 
-    private void serveHeadMove(GameBoard board, int oldHeadX, int oldHeadY) {
+    private Pair serveHeadMove(GameBoard board, int oldHeadX, int oldHeadY) {
+        Pair appleCords = new Pair(-1, -1);
         if (board.getPlayer().getDirection() == MoveDirection.UP){
-            moveHeadUp(board, oldHeadX, oldHeadY);
+            appleCords = moveHeadUp(board, oldHeadX, oldHeadY);
 
         } else if (board.getPlayer().getDirection() == MoveDirection.DOWN){
-            moveHeadDown(board, oldHeadX, oldHeadY);
+            appleCords = moveHeadDown(board, oldHeadX, oldHeadY);
         } else if (board.getPlayer().getDirection() == MoveDirection.LEFT){
-            moveHeadLeft(board, oldHeadX, oldHeadY);
+            appleCords = moveHeadLeft(board, oldHeadX, oldHeadY);
         } else if (board.getPlayer().getDirection() == MoveDirection.RIGHT){
-            moveHeadRight(board, oldHeadX, oldHeadY);
+            appleCords = moveHeadRight(board, oldHeadX, oldHeadY);
         }
+        return appleCords;
     }
 
     private void moveTail(GameBoard board, Integer oldTailY, Integer oldTailX) {
@@ -132,32 +132,58 @@ public class SnakeMovement {
         board.getGameMap().get(newTailY).set(oldTailX, GameElement.SNAKE_TAIL);
     }
 
-    private void moveHeadUp(GameBoard board, int oldHeadX, int oldHeadY) {
+    private Pair moveHeadUp(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
         int newHeadY = snakeElementsChecker.getNewSnakeElementPositionGoUp(oldHeadY);
+        Pair appleCords = new Pair(-1, -1);
+        checkIfAppleIsAboveOrUnderHeadAndSetAppleCords(board, oldHeadX, newHeadY, appleCords);
         board.getGameMap().get(newHeadY).set(oldHeadX, GameElement.SNAKE_HEAD);
         board.getPlayer().setHeadYCord(newHeadY);
+        return appleCords;
     }
 
-    private void moveHeadDown(GameBoard board, int oldHeadX, int oldHeadY) {
+    private Pair moveHeadDown(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
         int newHeadY = snakeElementsChecker.getNewSnakeElementPositionGoDown(oldHeadY);
+        Pair appleCords = new Pair(-1, -1);
+        checkIfAppleIsAboveOrUnderHeadAndSetAppleCords(board, oldHeadX, newHeadY, appleCords);
         board.getGameMap().get(newHeadY).set(oldHeadX, GameElement.SNAKE_HEAD);
         board.getPlayer().setHeadYCord(newHeadY);
+        return appleCords;
     }
 
-    private void moveHeadLeft(GameBoard board, int oldHeadX, int oldHeadY) {
+    private static void checkIfAppleIsAboveOrUnderHeadAndSetAppleCords(GameBoard board, int oldHeadX, int newHeadY, Pair appleCords) {
+        if (board.getGameMap().get(newHeadY).get(oldHeadX) == GameElement.APPLE){
+            appleCords.setX(oldHeadX);
+            appleCords.setY(newHeadY);
+        }
+    }
+
+    private Pair moveHeadLeft(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
         int newHeadX = snakeElementsChecker.getNewSnakeElementPositionGoLeft(oldHeadX);
+        Pair appleCords = new Pair(-1, -1);
+        checkIfAppleIsLeftOrRightHeadAndSetAppleCords(board, oldHeadY, newHeadX, appleCords);
         board.getGameMap().get(oldHeadY).set((newHeadX), GameElement.SNAKE_HEAD);
         board.getPlayer().setHeadXCord(newHeadX);
+        return appleCords;
     }
 
-    private void moveHeadRight(GameBoard board, int oldHeadX, int oldHeadY) {
+    private static void checkIfAppleIsLeftOrRightHeadAndSetAppleCords(GameBoard board, int oldHeadY, int newHeadX, Pair appleCords) {
+        if (board.getGameMap().get(oldHeadY).get(newHeadX) == GameElement.APPLE){
+            appleCords.setX(newHeadX);
+            appleCords.setY(oldHeadY);
+        }
+    }
+
+    private Pair moveHeadRight(GameBoard board, int oldHeadX, int oldHeadY) {
         board.getGameMap().get(oldHeadY).set(oldHeadX, GameElement.SNAKE_NODE);
         int newHeadX = snakeElementsChecker.getNewSnakeElementPositionGoRight(oldHeadX);
+        Pair appleCords = new Pair(-1, -1);
+        checkIfAppleIsLeftOrRightHeadAndSetAppleCords(board, oldHeadY, newHeadX, appleCords);
         board.getGameMap().get(oldHeadY).set((newHeadX), GameElement.SNAKE_HEAD);
         board.getPlayer().setHeadXCord(newHeadX);
+        return appleCords;
     }
 
 }

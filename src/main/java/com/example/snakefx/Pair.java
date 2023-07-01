@@ -24,4 +24,8 @@ public class Pair {
     public void setY(int y) {
         this.y = y;
     }
+
+    public boolean nothingHappened(){
+        return x == -1 && y == -1;
+    }
 }

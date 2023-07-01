@@ -107,4 +107,16 @@ public class Draw {
         gameLayout.getChildren().removeAll(nodesToRemove);
 
     }
+
+    public void clearAppleFromGridPane(){
+        for (Node node : gameLayout.getChildren()){
+            if (node instanceof ImageView){
+                if (node.getId().equals("APPLE")){
+                    gameLayout.getChildren().remove(node);
+                    return;
+                }
+            }
+        }
+
+    }
 }
