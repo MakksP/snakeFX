@@ -23,10 +23,13 @@ public class Draw {
     public void drawPlayer(){
         MoveDirection direction = board.getPlayer().getDirection();
         ImageView head = generateSnakePart("/snake/snakeHead.png");
+        head.setId("SNAKE_HEAD");
 
         ImageView node = generateSnakePart("/snake/snakeNode.png");
+        node.setId("SNAKE_NODE");
 
         ImageView tail = generateSnakePart("/snake/snakeTail.png");
+        tail.setId("SNAKE_TAIL");
 
         int consideredPartX = board.getPlayer().getHeadXCord();
         int consideredPartY = board.getPlayer().getHeadYCord();
@@ -83,7 +86,9 @@ public class Draw {
         List<Node> nodesToRemove = new ArrayList<>();
         for (Node node : gameLayout.getChildren()){
             if (node instanceof ImageView){
-                nodesToRemove.add(node);
+                if (node.getId().equals("SNAKE_HEAD") || node.getId().equals("SNAKE_NODE") || node.getId().equals("SNAKE_TAIL")){
+                    nodesToRemove.add(node);
+                }
             }
         }
         gameLayout.getChildren().removeAll(nodesToRemove);
