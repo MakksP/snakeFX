@@ -32,8 +32,10 @@ public class SnakeMovement {
             int oldHeadY = board.getPlayer().getHeadYCord();
 
             Pair tailCords = new Pair(0, 0);
+            Pair appleCords = new Pair(-1, -1);
             snakeElementsChecker.findTailCords(board, tailCords);
-            moveAndDraw(board, oldHeadX, oldHeadY, tailCords.getY(), tailCords.getX());
+            appleCords = moveAndDrawSnake(board, oldHeadX, oldHeadY, tailCords.getY(), tailCords.getX());
+            repaintEatenAppleAndIncreaseEatenCounter(board, drawElement, appleCords);
 
         }));
         scheduleMove.setCycleCount(Timeline.INDEFINITE);
@@ -43,29 +45,41 @@ public class SnakeMovement {
             KeyCode button = keyEvent.getCode();
             Snake player = board.getPlayer();
             Pair tailCords = new Pair(0, 0);
+            Pair appleCords = new Pair(-1, -1);
             snakeElementsChecker.findTailCords(board, tailCords);
             if (button == KeyCode.UP && player.getDirection() != MoveDirection.DOWN) {
                 player.setDirection(MoveDirection.UP);
-                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+                appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             } else if (button == KeyCode.DOWN && player.getDirection() != MoveDirection.UP) {
                 player.setDirection(MoveDirection.DOWN);
-                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+                appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             } else if (button == KeyCode.LEFT && player.getDirection() != MoveDirection.RIGHT) {
                 player.setDirection(MoveDirection.LEFT);
-                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+                appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             } else if (button == KeyCode.RIGHT && player.getDirection() != MoveDirection.LEFT) {
                 player.setDirection(MoveDirection.RIGHT);
-                moveAndDraw(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
+                appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             }
+            repaintEatenAppleAndIncreaseEatenCounter(board, drawElement, appleCords);
         });
 
     }
 
-    private void moveAndDraw(GameBoard board, int oldHeadX, int oldHeadY, int oldTailY, int oldTailX) {
+    private static void repaintEatenAppleAndIncreaseEatenCounter(GameBoard board, Draw drawElement, Pair appleCords) {
+        Platform.runLater(() -> {
+            if (!appleCords.nothingHappened()){
+                drawElement.clearAppleFromGridPane();
+                drawElement.drawAppleInRandomPlace();
+                board.getPlayer().setEatenApples(board.getPlayer().getEatenApples() + 1);
+            }
+        });
+    }
+
+    private Pair moveAndDrawSnake(GameBoard board, int oldHeadX, int oldHeadY, int oldTailY, int oldTailX) {
         Platform.runLater(() -> {
             drawElement.clearSnakeFromGridPane();
         });
@@ -73,11 +87,9 @@ public class SnakeMovement {
         Pair appleCords = serveHeadMove(board, oldHeadX, oldHeadY);
         Platform.runLater(() -> {
             drawElement.drawPlayer();
-            if (!appleCords.nothingHappened()){
-                drawElement.clearAppleFromGridPane();
-                drawElement.drawAppleInRandomPlace();
-            }
         });
+
+        return appleCords;
     }
 
     private Pair serveHeadMove(GameBoard board, int oldHeadX, int oldHeadY) {

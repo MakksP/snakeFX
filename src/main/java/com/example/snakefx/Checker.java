@@ -7,9 +7,6 @@ public class Checker {
     public final int MAX_X_INDEX = 39;
     public final int MAX_Y_INDEX = 19;
     public final int MIN_X_Y_INDEX = 0;
-    private final int ELEMENT_DOWN = 1;
-    private final int ELEMENT_UP = 1;
-    private final int ELEMENT_LEFT = 1;
 
     public Checker(GameBoard gameBoard){
         this.board = gameBoard;
