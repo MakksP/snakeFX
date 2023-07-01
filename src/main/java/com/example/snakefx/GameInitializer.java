@@ -17,6 +17,8 @@ public class GameInitializer {
     private Stage mainStage;
     private Scene gameScene;
     private GridPane gameLayout;
+    private Draw drawSnake;
+    private Checker snakeElementsChecker;
     private final int mapWidth = 40;
     private final int mapHeight = 20;
 
@@ -24,6 +26,8 @@ public class GameInitializer {
         board = GameBoard.getInstance();
         this.mainStage = mainStage;
         gameLayout = new GridPane();
+        snakeElementsChecker = new Checker(board);
+        drawSnake = new Draw(gameLayout, board, snakeElementsChecker);
         gameLayout.setPrefWidth(WINDOW_WIDTH);
         gameLayout.setPrefHeight(WINDOW_HEIGHT);
 
@@ -31,8 +35,9 @@ public class GameInitializer {
         mainStage.setScene(gameScene);
         spawnPlayer();
         drawBackground();
-        SnakeMovement movement = new SnakeMovement(board, gameLayout, gameScene);
-
+        SnakeMovement movement = new SnakeMovement(board, gameLayout, gameScene, snakeElementsChecker, drawSnake);
+        drawSnake.drawPlayer();
+        drawSnake.drawAppleInRandomPlace();
     }
 
     public void spawnPlayer(){

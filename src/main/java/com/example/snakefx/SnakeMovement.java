@@ -23,13 +23,12 @@ public class SnakeMovement {
     private final Checker snakeElementsChecker;
     private final Draw drawSnake;
 
-    public SnakeMovement(GameBoard board, GridPane gameLayout, Scene gameScene){
+    public SnakeMovement(GameBoard board, GridPane gameLayout, Scene gameScene, Checker snakeElementsChecker, Draw drawSnake){
         this.board = board;
         this.gameLayout = gameLayout;
         this.gameScene = gameScene;
-        this.snakeElementsChecker = new Checker(board);
-        this.drawSnake = new Draw(gameLayout, board, snakeElementsChecker);
-        this.drawSnake.drawPlayer();
+        this.snakeElementsChecker = snakeElementsChecker;
+        this.drawSnake = drawSnake;
 
         Timeline scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
             Platform.runLater(() -> {

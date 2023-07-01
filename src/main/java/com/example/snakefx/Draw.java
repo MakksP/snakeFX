@@ -22,13 +22,13 @@ public class Draw {
 
     public void drawPlayer(){
         MoveDirection direction = board.getPlayer().getDirection();
-        ImageView head = generateSnakePart("/snake/snakeHead.png");
+        ImageView head = generateImage("/snake/snakeHead.png");
         head.setId("SNAKE_HEAD");
 
-        ImageView node = generateSnakePart("/snake/snakeNode.png");
+        ImageView node = generateImage("/snake/snakeNode.png");
         node.setId("SNAKE_NODE");
 
-        ImageView tail = generateSnakePart("/snake/snakeTail.png");
+        ImageView tail = generateImage("/snake/snakeTail.png");
         tail.setId("SNAKE_TAIL");
 
         int consideredPartX = board.getPlayer().getHeadXCord();
@@ -39,7 +39,7 @@ public class Draw {
 
     }
 
-    private void drawHead(MoveDirection direction, ImageView head) {
+    public void drawHead(MoveDirection direction, ImageView head) {
         gameLayout.add(head, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
         if (direction == MoveDirection.UP){
             head.setRotate(270);
@@ -50,7 +50,20 @@ public class Draw {
         }
     }
 
-    public ImageView generateSnakePart(String path){
+    public void drawAppleInRandomPlace(){
+        ImageView apple = generateImage("/snake/apple.png");
+        apple.setId("APPLE");
+        Pair appleCords = addAppleToGameBoardInRandomPlace();
+        gameLayout.add(apple, appleCords.getX(), appleCords.getY());
+    }
+
+    public Pair addAppleToGameBoardInRandomPlace() {
+        Pair appleCords = new Pair((int)(Math.random() * 40), (int)(Math.random() * 20));
+        board.getGameMap().get(appleCords.getY()).set(appleCords.getX(), GameElement.APPLE);
+        return appleCords;
+    }
+
+    public ImageView generateImage(String path){
         Image image = new Image(getClass().getResourceAsStream(path));
         return new ImageView(image);
     }
