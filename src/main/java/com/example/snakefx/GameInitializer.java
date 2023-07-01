@@ -32,8 +32,6 @@ public class GameInitializer {
         spawnPlayer();
         drawBackground();
         SnakeMovement movement = new SnakeMovement(board, gameLayout, gameScene);
-        movement.drawPlayer();
-        //todo action listeners for keys
 
     }
 
