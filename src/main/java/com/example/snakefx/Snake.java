@@ -54,4 +54,12 @@ public class Snake {
     public void setHeadYCord(int headYCord) {
         this.headYCord = headYCord;
     }
+
+    public void increaseLevel(){
+        level++;
+    }
+
+    public void setEatenZero(){
+        eatenApples = 0;
+    }
 }

@@ -70,36 +70,49 @@ public class Draw {
 
     private void findNodesTailPositionAndDraw(ImageView node, ImageView tail, int consideredPartX, int consideredPartY) {
         ImageView element;
+        NodeCheckDirection checkDirection = NodeCheckDirection.DEFAULT;
         for (int i = 0; i < board.getPlayer().getLevel() + CHECK_HEAD; i++) {
             if (i < board.getPlayer().getLevel() + CHECK_HEAD - 1){
-                element = node;
+                element = generateNewNode(node, i);
             } else {
                 element = tail;
             }
-            if (snakeElementsChecker.nodeIsUnder(consideredPartX, consideredPartY)){
+            if (snakeElementsChecker.nodeIsUnder(consideredPartX, consideredPartY) && checkDirection != NodeCheckDirection.UP){
+                checkDirection = NodeCheckDirection.DOWN;
                 consideredPartY = snakeElementsChecker.getNewSnakeElementPositionGoDown(consideredPartY);
                 gameLayout.add(element, consideredPartX, consideredPartY);
                 element.setRotate(270);
-            } else if (snakeElementsChecker.nodeIsAbove(consideredPartX, consideredPartY)){
+            } else if (snakeElementsChecker.nodeIsAbove(consideredPartX, consideredPartY) && checkDirection != NodeCheckDirection.DOWN){
+                checkDirection = NodeCheckDirection.UP;
                 consideredPartY = snakeElementsChecker.getNewSnakeElementPositionGoUp(consideredPartY);
                 gameLayout.add(element, consideredPartX, consideredPartY);
                 element.setRotate(90);
-            } else if (snakeElementsChecker.nodeIsLeft(consideredPartX, consideredPartY)){
+            } else if (snakeElementsChecker.nodeIsLeft(consideredPartX, consideredPartY) && checkDirection != NodeCheckDirection.RIGHT){
+                checkDirection = NodeCheckDirection.LEFT;
                 consideredPartX = snakeElementsChecker.getNewSnakeElementPositionGoLeft(consideredPartX);
                 gameLayout.add(element, consideredPartX, consideredPartY);
-            } else{
+            } else if (checkDirection != NodeCheckDirection.LEFT){
+                checkDirection = NodeCheckDirection.RIGHT;
                 consideredPartX = snakeElementsChecker.getNewSnakeElementPositionGoRight(consideredPartX);
                 gameLayout.add(element, consideredPartX, consideredPartY);
                 element.setRotate(180);
             }
         }
     }
+    
+
+    private ImageView generateNewNode(ImageView node, int i) {
+        ImageView element;
+        element = generateImage("/snake/snakeNode.png");
+        element.setId(node.getId() + i);
+        return element;
+    }
 
     public void clearSnakeFromGridPane(){
         List<Node> nodesToRemove = new ArrayList<>();
         for (Node node : gameLayout.getChildren()){
             if (node instanceof ImageView){
-                if (node.getId().equals("SNAKE_HEAD") || node.getId().equals("SNAKE_NODE") || node.getId().equals("SNAKE_TAIL")){
+                if (node.getId().equals("SNAKE_HEAD") || node.getId().contains("SNAKE_NODE") || node.getId().equals("SNAKE_TAIL")){
                     nodesToRemove.add(node);
                 }
             }

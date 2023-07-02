@@ -32,10 +32,14 @@ public class SnakeMovement {
             int oldHeadY = board.getPlayer().getHeadYCord();
 
             Pair tailCords = new Pair(0, 0);
-            Pair appleCords = new Pair(-1, -1);
             snakeElementsChecker.findTailCords(board, tailCords);
-            appleCords = moveAndDrawSnake(board, oldHeadX, oldHeadY, tailCords.getY(), tailCords.getX());
+            Pair appleCords = moveAndDrawSnake(board, oldHeadX, oldHeadY, tailCords.getY(), tailCords.getX());
             repaintEatenAppleAndIncreaseEatenCounter(board, drawElement, appleCords);
+            if (board.getPlayer().getEatenApples() > 3){
+                board.getPlayer().increaseLevel();
+                board.getPlayer().setEatenZero();
+                serveHeadMove(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
+            }
 
         }));
         scheduleMove.setCycleCount(Timeline.INDEFINITE);
@@ -65,6 +69,11 @@ public class SnakeMovement {
 
             }
             repaintEatenAppleAndIncreaseEatenCounter(board, drawElement, appleCords);
+            if (board.getPlayer().getEatenApples() > 3){
+                board.getPlayer().increaseLevel();
+                board.getPlayer().setEatenZero();
+                serveHeadMove(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
+            }
         });
 
     }
