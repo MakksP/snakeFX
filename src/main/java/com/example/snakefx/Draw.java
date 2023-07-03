@@ -4,24 +4,39 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
+import java.security.URIParameter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Draw {
+    public static final int UP_ANGLE = 270;
+    public static final int LEFT_ANGLE = 180;
+    public static final int DOWN_ANGLE = 90;
     private final GridPane gameLayout;
-    private final GameBoard board;
-    private final int CHECK_HEAD = 1;
-    private final Checker snakeElementsChecker;
+    private final Snake player;
+    private final int MAP_WIDTH = 40;
+    private final int MAP_HEIGHT = 20;
+    public static final int MAP_CELL_WIDTH = 48;
+    public static final int MAP_CELL_HEIGHT = 54;
 
-    public Draw(GridPane gameLayout, GameBoard board, Checker snakeElementsChecker){
+    public Draw(GridPane gameLayout, Snake player){
         this.gameLayout = gameLayout;
-        this.board = board;
-        this.snakeElementsChecker = snakeElementsChecker;
+        this.player = player;
+    }
+
+    public void drawMapBackground(){
+        for (int i = 0; i < MAP_HEIGHT; i++){
+            for (int j = 0; j <MAP_WIDTH; j++) {
+                Rectangle mapCell = new Rectangle(MAP_CELL_WIDTH, MAP_CELL_HEIGHT, Color.BLACK);
+                gameLayout.add(mapCell, j, i);
+            }
+        }
     }
 
     public void drawPlayer(){
-        MoveDirection direction = board.getPlayer().getDirection();
         ImageView head = generateImage("/snake/snakeHead.png");
         head.setId("SNAKE_HEAD");
 
@@ -31,36 +46,85 @@ public class Draw {
         ImageView tail = generateImage("/snake/snakeTail.png");
         tail.setId("SNAKE_TAIL");
 
-        int consideredPartX = board.getPlayer().getHeadXCord();
-        int consideredPartY = board.getPlayer().getHeadYCord();
+        int elementCounter = 0;
+        Pair previousSnakeElement = new Pair(-1, -1);
+        for (Pair snakeElement : player.getSnakeElementsWithCords()){
+            if (elementIsHead(elementCounter)){
+                rotateHead(head);
+                gameLayout.add(head, snakeElement.getX(), snakeElement.getY());
 
-        drawHead(direction, head);
-        findNodesTailPositionAndDraw(node, tail, consideredPartX, consideredPartY);
+            } else if (elementIsTail(elementCounter)){
+                rotateOrdinaryElement(tail, previousSnakeElement, snakeElement);
+                gameLayout.add(tail, snakeElement.getX(), snakeElement.getY());
+
+            } else {
+                node = generateNewNode(node, elementCounter);
+                rotateOrdinaryElement(node, previousSnakeElement, snakeElement);
+                gameLayout.add(node, snakeElement.getX(), snakeElement.getY());
+
+            }
+            assignPreviousElementCords(previousSnakeElement, snakeElement);
+            elementCounter++;
+
+        }
 
     }
 
-    public void drawHead(MoveDirection direction, ImageView head) {
-        gameLayout.add(head, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
-        if (direction == MoveDirection.UP){
-            head.setRotate(270);
-        } else if (direction == MoveDirection.LEFT){
-            head.setRotate(180);
-        } else if (direction == MoveDirection.DOWN){
-            head.setRotate(90);
+    public void assignPreviousElementCords(Pair previousSnakeElement, Pair snakeElement) {
+        previousSnakeElement.setX(snakeElement.getX());
+        previousSnakeElement.setY(snakeElement.getY());
+    }
+
+    public boolean elementIsTail(int elementCounter) {
+        return elementCounter == player.getSnakeElementsWithCords().size() - 1;
+    }
+
+    public boolean elementIsHead(int elementCounter) {
+        return elementCounter == 0;
+    }
+
+    public void rotateHead(ImageView head) {
+        if (player.getDirection() == MoveDirection.UP){
+            head.setRotate(UP_ANGLE);
+        } else if (player.getDirection() == MoveDirection.LEFT){
+            head.setRotate(LEFT_ANGLE);
+        } else if (player.getDirection() == MoveDirection.DOWN){
+            head.setRotate(DOWN_ANGLE);
         }
     }
+
+    public void rotateOrdinaryElement(ImageView element, Pair previousElement, Pair currentElement){
+        if (currentElementAtLeftToPrevious(previousElement, currentElement)){
+            element.setRotate(LEFT_ANGLE);
+        } else if (currentElementAbovePrevious(previousElement, currentElement)) {
+            element.setRotate(DOWN_ANGLE);
+        } else if (currentElementUnderPrevious(previousElement, currentElement)) {
+            element.setRotate(UP_ANGLE);
+        }
+    }
+
+    public boolean currentElementAtLeftToPrevious(Pair previousElement, Pair currentElement) {
+        return currentElement.getX() < previousElement.getX();
+    }
+
+    public boolean currentElementAbovePrevious(Pair previousElement, Pair currentElement){
+        return currentElement.getY() < previousElement.getY();
+    }
+
+    public boolean currentElementUnderPrevious(Pair previousElement, Pair currentElement){
+        return currentElement.getY() > previousElement.getY();
+    }
+
 
     public void drawAppleInRandomPlace(){
         ImageView apple = generateImage("/snake/apple.png");
         apple.setId("APPLE");
-        Pair appleCords = addAppleToGameBoardInRandomPlace();
+        Pair appleCords = generateAppleRandomCords();
         gameLayout.add(apple, appleCords.getX(), appleCords.getY());
     }
 
-    public Pair addAppleToGameBoardInRandomPlace() {
-        Pair appleCords = new Pair((int)(Math.random() * 40), (int)(Math.random() * 20));
-        board.getGameMap().get(appleCords.getY()).set(appleCords.getX(), GameElement.APPLE);
-        return appleCords;
+    public Pair generateAppleRandomCords() {
+        return new Pair((int)(Math.random() * 40), (int)(Math.random() * 20));
     }
 
     public ImageView generateImage(String path){
@@ -68,38 +132,6 @@ public class Draw {
         return new ImageView(image);
     }
 
-    private void findNodesTailPositionAndDraw(ImageView node, ImageView tail, int consideredPartX, int consideredPartY) {
-        ImageView element;
-        NodeCheckDirection checkDirection = NodeCheckDirection.DEFAULT;
-        for (int i = 0; i < board.getPlayer().getLevel() + CHECK_HEAD; i++) {
-            if (i < board.getPlayer().getLevel() + CHECK_HEAD - 1){
-                element = generateNewNode(node, i);
-            } else {
-                element = tail;
-            }
-            if (snakeElementsChecker.nodeIsUnder(consideredPartX, consideredPartY) && checkDirection != NodeCheckDirection.UP){
-                checkDirection = NodeCheckDirection.DOWN;
-                consideredPartY = snakeElementsChecker.getNewSnakeElementPositionGoDown(consideredPartY);
-                gameLayout.add(element, consideredPartX, consideredPartY);
-                element.setRotate(270);
-            } else if (snakeElementsChecker.nodeIsAbove(consideredPartX, consideredPartY) && checkDirection != NodeCheckDirection.DOWN){
-                checkDirection = NodeCheckDirection.UP;
-                consideredPartY = snakeElementsChecker.getNewSnakeElementPositionGoUp(consideredPartY);
-                gameLayout.add(element, consideredPartX, consideredPartY);
-                element.setRotate(90);
-            } else if (snakeElementsChecker.nodeIsLeft(consideredPartX, consideredPartY) && checkDirection != NodeCheckDirection.RIGHT){
-                checkDirection = NodeCheckDirection.LEFT;
-                consideredPartX = snakeElementsChecker.getNewSnakeElementPositionGoLeft(consideredPartX);
-                gameLayout.add(element, consideredPartX, consideredPartY);
-            } else if (checkDirection != NodeCheckDirection.LEFT){
-                checkDirection = NodeCheckDirection.RIGHT;
-                consideredPartX = snakeElementsChecker.getNewSnakeElementPositionGoRight(consideredPartX);
-                gameLayout.add(element, consideredPartX, consideredPartY);
-                element.setRotate(180);
-            }
-        }
-    }
-    
 
     private ImageView generateNewNode(ImageView node, int i) {
         ImageView element;
@@ -130,6 +162,5 @@ public class Draw {
                 }
             }
         }
-
     }
 }

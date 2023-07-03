@@ -4,6 +4,5 @@ public enum NodeCheckDirection {
     LEFT,
     RIGHT,
     UP,
-    DOWN,
-    DEFAULT
+    DOWN
 }
