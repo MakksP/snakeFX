@@ -27,9 +27,10 @@ public class GameInitializer {
         mainStage.setScene(gameScene);
         spawnPlayer();
         drawSnake.drawMapBackground();
-        SnakeMovement movement = new SnakeMovement(player, gameLayout, gameScene, drawSnake);
+        Pair firstAppleCords = drawSnake.drawAppleInRandomPlace();
+        SnakeMovement movement = new SnakeMovement(player, gameLayout, gameScene, drawSnake, firstAppleCords);
         drawSnake.drawPlayer();
-        drawSnake.drawAppleInRandomPlace();
+
     }
 
 

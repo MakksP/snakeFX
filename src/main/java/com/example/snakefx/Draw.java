@@ -7,7 +7,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.security.URIParameter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,11 +115,12 @@ public class Draw {
     }
 
 
-    public void drawAppleInRandomPlace(){
+    public Pair drawAppleInRandomPlace(){
         ImageView apple = generateImage("/snake/apple.png");
         apple.setId("APPLE");
         Pair appleCords = generateAppleRandomCords();
         gameLayout.add(apple, appleCords.getX(), appleCords.getY());
+        return new Pair(appleCords.getX(), appleCords.getY());
     }
 
     public Pair generateAppleRandomCords() {

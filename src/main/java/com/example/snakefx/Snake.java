@@ -52,8 +52,21 @@ public class Snake {
         return snakeElementsWithCords;
     }
 
+    public void setSnakeElementsWithCords(List <Pair> newSnakeElementsWithCords){
+        snakeElementsWithCords = newSnakeElementsWithCords;
+    }
+
     public Pair getHeadCords(){
         return new Pair(snakeElementsWithCords.get(0).getX(), snakeElementsWithCords.get(0).getY());
+    }
+
+    public boolean cordsAreBusy(Pair cords){
+        for (Pair element : snakeElementsWithCords){
+            if (element.getX() == cords.getX() && element.getY() == cords.getY()){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
