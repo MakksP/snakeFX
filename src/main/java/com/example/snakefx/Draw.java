@@ -115,10 +115,9 @@ public class Draw {
     }
 
 
-    public Pair drawAppleInRandomPlace(){
+    public Pair drawAppleInRandomPlace(Pair appleCords){
         ImageView apple = generateImage("/snake/apple.png");
         apple.setId("APPLE");
-        Pair appleCords = generateAppleRandomCords();
         gameLayout.add(apple, appleCords.getX(), appleCords.getY());
         return new Pair(appleCords.getX(), appleCords.getY());
     }

@@ -10,6 +10,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class SnakeMovement {
@@ -33,7 +34,7 @@ public class SnakeMovement {
         this.gameScene = gameScene;
         this.drawElement = drawElement;
 
-
+        final Pair[] appleCords = {firstAppleCords};
         Timeline scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
             Platform.runLater(() -> {
                 drawElement.clearSnakeFromGridPane();
@@ -42,7 +43,17 @@ public class SnakeMovement {
             Platform.runLater(() -> {
                 drawElement.drawPlayer();
             });
-
+            if (eatenApple(player, appleCords[0])){
+                appleCords[0] = drawElement.generateAppleRandomCords();
+                Platform.runLater(() -> {
+                    repaintEatenApple(drawElement, appleCords[0]);
+                });
+                if (player.getEatenApples() > 0){
+                    player.increaseLevel();
+                    player.setEatenZero();
+                    //serveHeadMove(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
+                }
+            }
         }));
         scheduleMove.setCycleCount(Timeline.INDEFINITE);
         scheduleMove.play();
@@ -51,19 +62,15 @@ public class SnakeMovement {
             KeyCode button = keyEvent.getCode();
             if (button == KeyCode.UP && player.getDirection() != MoveDirection.DOWN) {
                 player.setDirection(MoveDirection.UP);
-                //appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             } else if (button == KeyCode.DOWN && player.getDirection() != MoveDirection.UP) {
                 player.setDirection(MoveDirection.DOWN);
-                //appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             } else if (button == KeyCode.LEFT && player.getDirection() != MoveDirection.RIGHT) {
                 player.setDirection(MoveDirection.LEFT);
-                //appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             } else if (button == KeyCode.RIGHT && player.getDirection() != MoveDirection.LEFT) {
                 player.setDirection(MoveDirection.RIGHT);
-                //appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             }
             Platform.runLater(() -> {
@@ -73,23 +80,30 @@ public class SnakeMovement {
             Platform.runLater(() -> {
                 drawElement.drawPlayer();
             });
-            //repaintEatenAppleAndIncreaseEatenCounter(drawElement, appleCords);
-            if (player.getEatenApples() > 0){
-                player.increaseLevel();
-                player.setEatenZero();
-                //serveHeadMove(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
+            if (eatenApple(player, appleCords[0])){
+                appleCords[0] = drawElement.generateAppleRandomCords();
+                Platform.runLater(() -> {
+                    repaintEatenApple(drawElement, appleCords[0]);
+                });
+                if (player.getEatenApples() > 0){
+                    player.increaseLevel();
+                    player.setEatenZero();
+                    //serveHeadMove(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
+                }
             }
         });
 
     }
 
-    public void repaintEatenAppleAndIncreaseEatenCounter(Draw drawElement, Pair appleCords) {
+    private static boolean eatenApple(Snake player, Pair appleCords) {
+        return player.getHeadCords().getX() == appleCords.getX() && player.getHeadCords().getY() == appleCords.getY();
+    }
+
+    public void repaintEatenApple(Draw drawElement, Pair appleCords) {
         Platform.runLater(() -> {
-            if (!appleCords.nothingHappened()){
                 drawElement.clearAppleFromGridPane();
-                drawElement.drawAppleInRandomPlace();
-                player.setEatenApples(player.getEatenApples() + 1);
-            }
+                drawElement.drawAppleInRandomPlace(appleCords);
+
         });
     }
 
