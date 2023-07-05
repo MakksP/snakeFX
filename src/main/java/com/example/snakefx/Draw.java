@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Draw {
     public static final int UP_ANGLE = 270;
-    public static final int LEFT_ANGLE = 180;
+    public static final int RIGHT_ANGLE = 180;
     public static final int DOWN_ANGLE = 90;
     private final GridPane gameLayout;
     private final Snake player;
@@ -86,15 +86,15 @@ public class Draw {
         if (player.getDirection() == MoveDirection.UP){
             head.setRotate(UP_ANGLE);
         } else if (player.getDirection() == MoveDirection.LEFT){
-            head.setRotate(LEFT_ANGLE);
+            head.setRotate(RIGHT_ANGLE);
         } else if (player.getDirection() == MoveDirection.DOWN){
             head.setRotate(DOWN_ANGLE);
         }
     }
 
     public void rotateOrdinaryElement(ImageView element, Pair previousElement, Pair currentElement){
-        if (currentElementAtLeftToPrevious(previousElement, currentElement)){
-            element.setRotate(LEFT_ANGLE);
+        if (currentElementAtRightToPrevious(previousElement, currentElement)){
+            element.setRotate(RIGHT_ANGLE);
         } else if (currentElementAbovePrevious(previousElement, currentElement)) {
             element.setRotate(DOWN_ANGLE);
         } else if (currentElementUnderPrevious(previousElement, currentElement)) {
@@ -102,8 +102,8 @@ public class Draw {
         }
     }
 
-    public boolean currentElementAtLeftToPrevious(Pair previousElement, Pair currentElement) {
-        return currentElement.getX() < previousElement.getX();
+    public boolean currentElementAtRightToPrevious(Pair previousElement, Pair currentElement) {
+        return currentElement.getX() > previousElement.getX();
     }
 
     public boolean currentElementAbovePrevious(Pair previousElement, Pair currentElement){

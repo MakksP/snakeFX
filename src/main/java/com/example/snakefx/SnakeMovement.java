@@ -66,6 +66,13 @@ public class SnakeMovement {
                 //appleCords = moveAndDrawSnake(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord(), tailCords.getY(), tailCords.getX());
 
             }
+            Platform.runLater(() -> {
+                drawElement.clearSnakeFromGridPane();
+            });
+            player.setSnakeElementsWithCords(generateNewPositionAfterMoveSnake());
+            Platform.runLater(() -> {
+                drawElement.drawPlayer();
+            });
             //repaintEatenAppleAndIncreaseEatenCounter(drawElement, appleCords);
             if (player.getEatenApples() > 0){
                 player.increaseLevel();
@@ -93,7 +100,7 @@ public class SnakeMovement {
             if (elementCount == 0){
                 generateNewHeadPositionAfterMove(newSnakeCords);
             } else {
-                generateNewOrdinaryElementsPositionAfterMove(newSnakeCords, element);
+                generateNewOrdinaryElementsPositionAfterMove(newSnakeCords, element, elementCount);
             }
             elementCount++;
         }
@@ -114,19 +121,19 @@ public class SnakeMovement {
         }
     }
 
-    public void generateNewOrdinaryElementsPositionAfterMove(List<Pair> newSnakeCords, Pair elementToMove){
+    public void generateNewOrdinaryElementsPositionAfterMove(List<Pair> newSnakeCords, Pair elementToMove, int elementCount){
         Pair newPositionCords = generateCordsForElementAfterGoLeft(elementToMove);
-        if (addElementToPaneIfIsNext(newSnakeCords, newPositionCords)) return;
+        if (addElementToPaneIfIsNext(newSnakeCords, newPositionCords, elementCount)) return;
         newPositionCords = generateCordsForElementAfterGoRight(elementToMove);
-        if (addElementToPaneIfIsNext(newSnakeCords, newPositionCords)) return;
+        if (addElementToPaneIfIsNext(newSnakeCords, newPositionCords, elementCount)) return;
         newPositionCords = generateCordsForElementAfterGoUp(elementToMove);
-        if (addElementToPaneIfIsNext(newSnakeCords, newPositionCords)) return;
+        if (addElementToPaneIfIsNext(newSnakeCords, newPositionCords, elementCount)) return;
         newPositionCords = generateCordsForElementAfterGoDown(elementToMove);
-        addElementToPaneIfIsNext(newSnakeCords, newPositionCords);
+        addElementToPaneIfIsNext(newSnakeCords, newPositionCords, elementCount);
     }
 
-    private boolean addElementToPaneIfIsNext(List<Pair> newSnakeCords, Pair newPositionCords) {
-        if (player.cordsAreBusy(newPositionCords)){
+    private boolean addElementToPaneIfIsNext(List<Pair> newSnakeCords, Pair newPositionCords, int elementCount) {
+        if (player.cordsAreEquivalent(newPositionCords, elementCount)){
             newSnakeCords.add(newPositionCords);
             return true;
         }

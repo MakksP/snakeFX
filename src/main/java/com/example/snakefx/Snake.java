@@ -60,11 +60,10 @@ public class Snake {
         return new Pair(snakeElementsWithCords.get(0).getX(), snakeElementsWithCords.get(0).getY());
     }
 
-    public boolean cordsAreBusy(Pair cords){
-        for (Pair element : snakeElementsWithCords){
-            if (element.getX() == cords.getX() && element.getY() == cords.getY()){
-                return true;
-            }
+    public boolean cordsAreEquivalent(Pair cords, int elementCount){
+        Pair equivalentElement = snakeElementsWithCords.get(elementCount - 1);
+        if (equivalentElement.getX() == cords.getX() && equivalentElement.getY() == cords.getY()){
+            return true;
         }
         return false;
     }
