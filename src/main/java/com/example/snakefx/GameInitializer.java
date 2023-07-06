@@ -1,61 +1,43 @@
 package com.example.snakefx;
 
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class GameInitializer {
-    public static final int MAP_CELL_WIDTH = 48;
-    public static final int MAP_CELL_HEIGHT = 54;
     public static final int WINDOW_WIDTH = 1920;
     public static final int WINDOW_HEIGHT = 1080;
-    private GameBoard board;
+    public static final int HEAD_START_X = 20;
+    public static final int HEAD_START_Y = 10;
     private Stage mainStage;
     private Scene gameScene;
     private GridPane gameLayout;
     private Draw drawSnake;
-    private Checker snakeElementsChecker;
-    private final int mapWidth = 40;
-    private final int mapHeight = 20;
+    private Snake player;
 
     public GameInitializer(Stage mainStage){
-        board = GameBoard.getInstance();
         this.mainStage = mainStage;
         gameLayout = new GridPane();
-        snakeElementsChecker = new Checker(board);
-        drawSnake = new Draw(gameLayout, board, snakeElementsChecker);
+        player = new Snake();
+        drawSnake = new Draw(gameLayout, player);
         gameLayout.setPrefWidth(WINDOW_WIDTH);
         gameLayout.setPrefHeight(WINDOW_HEIGHT);
 
         gameScene = new Scene(gameLayout);
         mainStage.setScene(gameScene);
         spawnPlayer();
-        drawBackground();
-        SnakeMovement movement = new SnakeMovement(board, gameLayout, gameScene, snakeElementsChecker, drawSnake);
+        drawSnake.drawMapBackground();
+        Pair firstAppleCords = drawSnake.drawAppleInRandomPlace(drawSnake.generateAppleRandomCords());
+        SnakeMovement movement = new SnakeMovement(player, gameLayout, gameScene, drawSnake, firstAppleCords);
         drawSnake.drawPlayer();
-        drawSnake.drawAppleInRandomPlace();
+
     }
+
 
     public void spawnPlayer(){
-        board.createPlayer();
-        board.getGameMap().get(board.getPlayer().getHeadYCord()).set(board.getPlayer().getHeadXCord(), GameElement.SNAKE_HEAD);
-        board.getGameMap().get(board.getPlayer().getHeadYCord() + 1).set(board.getPlayer().getHeadXCord(), GameElement.SNAKE_NODE);
-        board.getGameMap().get(board.getPlayer().getHeadYCord() + 2).set(board.getPlayer().getHeadXCord(), GameElement.SNAKE_TAIL);
+        player.getSnakeElementsWithCords().add(new Pair(HEAD_START_X, HEAD_START_Y));
+        player.getSnakeElementsWithCords().add(new Pair(HEAD_START_X, HEAD_START_Y + 1));
+        player.getSnakeElementsWithCords().add(new Pair(HEAD_START_X, HEAD_START_Y + 2));
     }
-
-    public void drawBackground(){
-        for (int i = 0; i < mapHeight; i++){
-            for (int j = 0; j < mapWidth; j++) {
-                Rectangle mapCell = new Rectangle(MAP_CELL_WIDTH, MAP_CELL_HEIGHT, Color.BLACK);
-                gameLayout.add(mapCell, j, i);
-            }
-        }
-    }
-
-
 
 }

@@ -1,18 +1,19 @@
 package com.example.snakefx;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Snake {
     private int eatenApples;
     private int level;
     private MoveDirection direction;
-    private int headXCord;
-    private int headYCord;
+    private List<Pair> snakeElementsWithCords;
 
     public Snake(){
         eatenApples = 0;
         level = 1;
         direction = MoveDirection.UP;
-        headYCord = 10;
-        headXCord = 20;
+        snakeElementsWithCords = new ArrayList<>();
     }
 
     public int getEatenApples() {
@@ -39,22 +40,6 @@ public class Snake {
         this.direction = direction;
     }
 
-    public int getHeadXCord() {
-        return headXCord;
-    }
-
-    public void setHeadXCord(int headXCord) {
-        this.headXCord = headXCord;
-    }
-
-    public int getHeadYCord() {
-        return headYCord;
-    }
-
-    public void setHeadYCord(int headYCord) {
-        this.headYCord = headYCord;
-    }
-
     public void increaseLevel(){
         level++;
     }
@@ -62,4 +47,25 @@ public class Snake {
     public void setEatenZero(){
         eatenApples = 0;
     }
+
+    public List<Pair> getSnakeElementsWithCords() {
+        return snakeElementsWithCords;
+    }
+
+    public void setSnakeElementsWithCords(List <Pair> newSnakeElementsWithCords){
+        snakeElementsWithCords = newSnakeElementsWithCords;
+    }
+
+    public Pair getHeadCords(){
+        return new Pair(snakeElementsWithCords.get(0).getX(), snakeElementsWithCords.get(0).getY());
+    }
+
+    public boolean cordsAreEquivalent(Pair cords, int elementCount){
+        Pair equivalentElement = snakeElementsWithCords.get(elementCount - 1);
+        if (equivalentElement.getX() == cords.getX() && equivalentElement.getY() == cords.getY()){
+            return true;
+        }
+        return false;
+    }
+
 }
