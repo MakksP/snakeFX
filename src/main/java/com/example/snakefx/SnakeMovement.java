@@ -22,6 +22,7 @@ public class SnakeMovement {
     public static final int ONE_ELEMENT_UP = 1;
     public static final int MAX_Y_INDEX = 19;
     public static final int ONE_ELEMENT_DOWN = 1;
+    public static final int FIRST_SNAKE_NODE_INDEX = 1;
     private final GridPane gameLayout;
     private Scene gameScene;
     private final int periodOfTime = 800;
@@ -48,10 +49,11 @@ public class SnakeMovement {
                 Platform.runLater(() -> {
                     repaintEatenApple(drawElement, appleCords[0]);
                 });
+                player.setEatenApples(player.getEatenApples() + 1);
                 if (player.getEatenApples() > 0){
                     player.increaseLevel();
                     player.setEatenZero();
-                    //serveHeadMove(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
+                    player.setSnakeElementsWithCords(snakeLengthen());
                 }
             }
         }));
@@ -85,10 +87,11 @@ public class SnakeMovement {
                 Platform.runLater(() -> {
                     repaintEatenApple(drawElement, appleCords[0]);
                 });
+                player.setEatenApples(player.getEatenApples() + 1);
                 if (player.getEatenApples() > 0){
                     player.increaseLevel();
                     player.setEatenZero();
-                    //serveHeadMove(board, board.getPlayer().getHeadXCord(), board.getPlayer().getHeadYCord());
+                    player.setSnakeElementsWithCords(snakeLengthen());
                 }
             }
         });
@@ -189,5 +192,15 @@ public class SnakeMovement {
             newPositionCords.setY(MIN_X_Y_CORD);
         }
         return newPositionCords;
+    }
+
+    public List<Pair> snakeLengthen(){
+        List<Pair> newSnakeCords = new ArrayList<>();
+        generateNewHeadPositionAfterMove(newSnakeCords);
+        newSnakeCords.add(new Pair(player.getHeadCords().getX(), player.getHeadCords().getY()));
+        for (Pair element : player.getSnakeElementsWithCords().subList(FIRST_SNAKE_NODE_INDEX, player.getSnakeElementsWithCords().size())){
+            newSnakeCords.add(element);
+        }
+        return newSnakeCords;
     }
 }
