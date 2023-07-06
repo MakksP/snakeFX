@@ -123,7 +123,18 @@ public class Draw {
     }
 
     public Pair generateAppleRandomCords() {
-        return new Pair((int)(Math.random() * 40), (int)(Math.random() * 20));
+        Pair appleCords = new Pair((int)(Math.random() * 40), (int)(Math.random() * 20));
+        while (true){
+            for (Pair element : player.getSnakeElementsWithCords()){
+                if (appleCords.getY() == element.getY() && appleCords.getX() == element.getX()){
+                    appleCords = new Pair((int)(Math.random() * 40), (int)(Math.random() * 20));
+                    break;
+                }
+            }
+            break;
+        }
+
+        return appleCords;
     }
 
     public ImageView generateImage(String path){
