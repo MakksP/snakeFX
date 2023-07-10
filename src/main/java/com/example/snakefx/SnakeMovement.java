@@ -4,13 +4,13 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 public class SnakeMovement {
@@ -23,6 +23,8 @@ public class SnakeMovement {
     public static final int MAX_Y_INDEX = 19;
     public static final int ONE_ELEMENT_DOWN = 1;
     public static final int FIRST_SNAKE_NODE_INDEX = 1;
+    public static final int FIRST_NODE = 1;
+    public static final int APPLE_EATEN_NEEDS_TO_GROW = 1;
     private final GridPane gameLayout;
     private Scene gameScene;
     private final int periodOfTime = 800;
@@ -50,11 +52,14 @@ public class SnakeMovement {
                     repaintEatenApple(drawElement, appleCords[0]);
                 });
                 player.setEatenApples(player.getEatenApples() + 1);
-                if (player.getEatenApples() > 0){
+                if (player.getEatenApples() >= APPLE_EATEN_NEEDS_TO_GROW){
                     player.increaseLevel();
                     player.setEatenZero();
                     player.setSnakeElementsWithCords(snakeLengthen());
                 }
+            } else if (playerLost()){
+                LostInfoLabel lostInfoLabel = new LostInfoLabel(drawElement);
+                lostInfoLabel.addLostLabelToGameScene(gameLayout);
             }
         }));
         scheduleMove.setCycleCount(Timeline.INDEFINITE);
@@ -88,11 +93,14 @@ public class SnakeMovement {
                     repaintEatenApple(drawElement, appleCords[0]);
                 });
                 player.setEatenApples(player.getEatenApples() + 1);
-                if (player.getEatenApples() > 0){
+                if (player.getEatenApples() >= APPLE_EATEN_NEEDS_TO_GROW){
                     player.increaseLevel();
                     player.setEatenZero();
                     player.setSnakeElementsWithCords(snakeLengthen());
                 }
+            } else if (playerLost()){
+                LostInfoLabel lostInfoLabel = new LostInfoLabel(drawElement);
+                lostInfoLabel.addLostLabelToGameScene(gameLayout);
             }
         });
 
@@ -202,5 +210,15 @@ public class SnakeMovement {
             newSnakeCords.add(element);
         }
         return newSnakeCords;
+    }
+
+    public boolean playerLost(){
+        List <Pair> snakeCords = player.getSnakeElementsWithCords();
+        for (Pair element : snakeCords.subList(FIRST_NODE, snakeCords.size())){
+            if (element.getX() == player.getHeadCords().getX() && element.getY() == player.getHeadCords().getY()){
+                return true;
+            }
+        }
+        return false;
     }
 }
