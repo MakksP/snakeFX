@@ -16,8 +16,8 @@ public class Draw {
     public static final int DOWN_ANGLE = 90;
     private final GridPane gameLayout;
     private final Snake player;
-    private final int MAP_WIDTH = 40;
-    private final int MAP_HEIGHT = 20;
+    public final int MAP_WIDTH = 40;
+    public final int MAP_HEIGHT = 20;
     public static final int MAP_CELL_WIDTH = 48;
     public static final int MAP_CELL_HEIGHT = 54;
 
