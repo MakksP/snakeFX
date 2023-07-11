@@ -6,10 +6,12 @@ import java.util.List;
 public class Snake {
     private int eatenApples;
     private int level;
+    private boolean isActive;
     private MoveDirection direction;
     private List<Pair> snakeElementsWithCords;
 
     public Snake(){
+        isActive = true;
         eatenApples = 0;
         level = 1;
         direction = MoveDirection.UP;
@@ -68,4 +70,11 @@ public class Snake {
         return false;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }

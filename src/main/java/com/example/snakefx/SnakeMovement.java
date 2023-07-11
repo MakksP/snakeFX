@@ -30,6 +30,7 @@ public class SnakeMovement {
     private final int periodOfTime = 800;
     private final Draw drawElement;
     private Snake player;
+    private Timeline scheduleMove;
 
     public SnakeMovement(Snake player, GridPane gameLayout, Scene gameScene, Draw drawElement, Pair firstAppleCords){
         this.player = player;
@@ -38,7 +39,9 @@ public class SnakeMovement {
         this.drawElement = drawElement;
 
         final Pair[] appleCords = {firstAppleCords};
-        Timeline scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
+        scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
+
+
             Platform.runLater(() -> {
                 drawElement.clearSnakeFromGridPane();
             });
@@ -60,6 +63,8 @@ public class SnakeMovement {
             } else if (playerLost()){
                 LostInfoLabel lostInfoLabel = new LostInfoLabel(drawElement);
                 lostInfoLabel.addLostLabelToGameScene(gameLayout);
+                player.setActive(false);
+                gameStop();
             }
         }));
         scheduleMove.setCycleCount(Timeline.INDEFINITE);
@@ -67,6 +72,9 @@ public class SnakeMovement {
 
         this.gameScene.setOnKeyPressed(keyEvent -> {
             KeyCode button = keyEvent.getCode();
+            if (!player.isActive()){
+                return;
+            }
             if (button == KeyCode.UP && player.getDirection() != MoveDirection.DOWN) {
                 player.setDirection(MoveDirection.UP);
 
@@ -101,9 +109,15 @@ public class SnakeMovement {
             } else if (playerLost()){
                 LostInfoLabel lostInfoLabel = new LostInfoLabel(drawElement);
                 lostInfoLabel.addLostLabelToGameScene(gameLayout);
+                player.setActive(false);
+                gameStop();
             }
         });
 
+    }
+
+    public void gameStop(){
+        scheduleMove.stop();
     }
 
     private static boolean eatenApple(Snake player, Pair appleCords) {
