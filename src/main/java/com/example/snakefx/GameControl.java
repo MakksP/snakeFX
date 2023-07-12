@@ -67,8 +67,8 @@ public class GameControl {
                     player.setSnakeElementsWithCords(snakeLengthen());
                 }
             } else if (playerLost()){
-                LostInfoLabel lostInfoLabel = new LostInfoLabel(drawElement);
-                lostInfoLabel.addLostLabelToGameScene(gameLayout);
+                InfoLabel infoLabel = new InfoLabel(drawElement, "/snake/LostLabelImage.png");
+                infoLabel.addLabelToGameScene(gameLayout);
                 player.setActive(false);
                 gameStop();
             }
@@ -83,6 +83,20 @@ public class GameControl {
                 currentGame = null;
                 currentGame = new GameInitializer((Stage) gameLayout.getScene().getWindow());
                 return;
+            } else if (button == KeyCode.P){
+                InfoLabel infoLabel;
+                if (player.isActive()){
+                    player.setActive(false);
+                    gameStop();
+                    infoLabel = new InfoLabel(drawElement, "/snake/PauseLabelImage.png");
+                    infoLabel.setId("PAUSE_GAME_LABEL");
+                    infoLabel.addLabelToGameScene(gameLayout);
+                } else {
+                    player.setActive(true);
+                    gameStart();
+                    gameLayout.getChildren().remove(drawElement.findNodeById("PAUSE_GAME_LABEL"));
+
+                }
             } else if (!player.isActive()){
                 return;
             }
@@ -122,8 +136,8 @@ public class GameControl {
                     player.setSnakeElementsWithCords(snakeLengthen());
                 }
             } else if (playerLost()){
-                LostInfoLabel lostInfoLabel = new LostInfoLabel(drawElement);
-                lostInfoLabel.addLostLabelToGameScene(gameLayout);
+                InfoLabel infoLabel = new InfoLabel(drawElement, "/snake/LostLabelImage.png");
+                infoLabel.addLabelToGameScene(gameLayout);
                 player.setActive(false);
                 gameStop();
             }
@@ -133,6 +147,10 @@ public class GameControl {
 
     public void gameStop(){
         scheduleMove.stop();
+    }
+
+    public void gameStart(){
+        scheduleMove.play();
     }
 
     private static boolean eatenApple(Snake player, Pair appleCords) {
