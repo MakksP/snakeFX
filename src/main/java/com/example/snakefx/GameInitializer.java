@@ -28,7 +28,7 @@ public class GameInitializer {
         spawnPlayer();
         drawSnake.drawMapBackground();
         Pair firstAppleCords = drawSnake.drawAppleInRandomPlace(drawSnake.generateAppleRandomCords());
-        SnakeMovement movement = new SnakeMovement(player, gameLayout, gameScene, drawSnake, firstAppleCords);
+        GameControl movement = new GameControl(player, gameLayout, gameScene, drawSnake, firstAppleCords, this);
         drawSnake.drawPlayer();
 
     }
@@ -38,6 +38,14 @@ public class GameInitializer {
         player.getSnakeElementsWithCords().add(new Pair(HEAD_START_X, HEAD_START_Y));
         player.getSnakeElementsWithCords().add(new Pair(HEAD_START_X, HEAD_START_Y + 1));
         player.getSnakeElementsWithCords().add(new Pair(HEAD_START_X, HEAD_START_Y + 2));
+    }
+
+    public void clearGame(){
+        mainStage = null;
+        gameScene = null;
+        gameLayout = null;
+        drawSnake = null;
+        player = null;
     }
 
 }

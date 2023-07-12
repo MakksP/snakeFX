@@ -4,16 +4,16 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class SnakeMovement {
+public class GameControl {
     public static final int HEAD_INDEX = 0;
     public static final int MIN_X_Y_CORD = 0;
     public static final int ONE_ELEMENT_LEFT = 1;
@@ -25,18 +25,20 @@ public class SnakeMovement {
     public static final int FIRST_SNAKE_NODE_INDEX = 1;
     public static final int FIRST_NODE = 1;
     public static final int APPLE_EATEN_NEEDS_TO_GROW = 1;
-    private final GridPane gameLayout;
+    private GridPane gameLayout;
     private Scene gameScene;
     private final int periodOfTime = 800;
     private final Draw drawElement;
     private Snake player;
     private Timeline scheduleMove;
+    private GameInitializer currentGame;
 
-    public SnakeMovement(Snake player, GridPane gameLayout, Scene gameScene, Draw drawElement, Pair firstAppleCords){
+    public GameControl(Snake player, GridPane gameLayout, Scene gameScene, Draw drawElement, Pair firstAppleCords, GameInitializer gameInitializer){
         this.player = player;
         this.gameLayout = gameLayout;
         this.gameScene = gameScene;
         this.drawElement = drawElement;
+        currentGame = gameInitializer;
 
         final Pair[] appleCords = {firstAppleCords};
         scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
@@ -72,9 +74,15 @@ public class SnakeMovement {
 
         this.gameScene.setOnKeyPressed(keyEvent -> {
             KeyCode button = keyEvent.getCode();
-            if (!player.isActive()){
+            if (button == KeyCode.R){
+                currentGame.clearGame();
+                currentGame = null;
+                currentGame = new GameInitializer((Stage) gameLayout.getScene().getWindow());
+                return;
+            } else if (!player.isActive()){
                 return;
             }
+
             if (button == KeyCode.UP && player.getDirection() != MoveDirection.DOWN) {
                 player.setDirection(MoveDirection.UP);
 
