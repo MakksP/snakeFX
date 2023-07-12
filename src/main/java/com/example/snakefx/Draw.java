@@ -1,6 +1,7 @@
 package com.example.snakefx;
 
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -174,4 +175,14 @@ public class Draw {
         }
     }
 
+    public void repaintUpdatedPoints(){
+        for (Node node : gameLayout.getChildren()){
+            if (node.getId() != null){
+                if (node.getId().equals("SCORE_LABEL")){
+                    ((Label) node).setText("Punkty: " + player.getScore());
+                    return;
+                }
+            }
+        }
+    }
 }

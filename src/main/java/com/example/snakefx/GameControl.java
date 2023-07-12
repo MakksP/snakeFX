@@ -25,6 +25,7 @@ public class GameControl {
     public static final int FIRST_SNAKE_NODE_INDEX = 1;
     public static final int FIRST_NODE = 1;
     public static final int APPLE_EATEN_NEEDS_TO_GROW = 1;
+    public static final int SCORE_AMOUNT_AFTER_EATING_APPLE = 10;
     private GridPane gameLayout;
     private Scene gameScene;
     private final int periodOfTime = 800;
@@ -53,10 +54,13 @@ public class GameControl {
             });
             if (eatenApple(player, appleCords[0])){
                 appleCords[0] = drawElement.generateAppleRandomCords();
+                player.setEatenApples(player.getEatenApples() + 1);
+                player.setScore(player.getScore() + SCORE_AMOUNT_AFTER_EATING_APPLE);
                 Platform.runLater(() -> {
                     repaintEatenApple(drawElement, appleCords[0]);
+                    drawElement.repaintUpdatedPoints();
                 });
-                player.setEatenApples(player.getEatenApples() + 1);
+
                 if (player.getEatenApples() >= APPLE_EATEN_NEEDS_TO_GROW){
                     player.increaseLevel();
                     player.setEatenZero();
@@ -105,10 +109,13 @@ public class GameControl {
             });
             if (eatenApple(player, appleCords[0])){
                 appleCords[0] = drawElement.generateAppleRandomCords();
+                player.setEatenApples(player.getEatenApples() + 1);
+                player.setScore(player.getScore() + SCORE_AMOUNT_AFTER_EATING_APPLE);
                 Platform.runLater(() -> {
                     repaintEatenApple(drawElement, appleCords[0]);
+                    drawElement.repaintUpdatedPoints();
                 });
-                player.setEatenApples(player.getEatenApples() + 1);
+
                 if (player.getEatenApples() >= APPLE_EATEN_NEEDS_TO_GROW){
                     player.increaseLevel();
                     player.setEatenZero();
