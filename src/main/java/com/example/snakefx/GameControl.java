@@ -28,7 +28,7 @@ public class GameControl {
     public static final int SCORE_AMOUNT_AFTER_EATING_APPLE = 10;
     private GridPane gameLayout;
     private Scene gameScene;
-    private final int periodOfTime = 800;
+    private int periodOfTime = 800;
     private final Draw drawElement;
     private Snake player;
     private Timeline scheduleMove;
@@ -42,37 +42,9 @@ public class GameControl {
         currentGame = gameInitializer;
 
         final Pair[] appleCords = {firstAppleCords};
-        scheduleMove = new Timeline(new KeyFrame(Duration.millis(periodOfTime), event -> {
+        KeyFrame snakeMoveTask = generateSnakeMoveTask(player, gameLayout, drawElement, appleCords);
 
-
-            Platform.runLater(() -> {
-                drawElement.clearSnakeFromGridPane();
-            });
-            player.setSnakeElementsWithCords(generateNewPositionAfterMoveSnake());
-            Platform.runLater(() -> {
-                drawElement.drawPlayer();
-            });
-            if (eatenApple(player, appleCords[0])){
-                appleCords[0] = drawElement.generateAppleRandomCords();
-                player.setEatenApples(player.getEatenApples() + 1);
-                player.setScore(player.getScore() + SCORE_AMOUNT_AFTER_EATING_APPLE);
-                Platform.runLater(() -> {
-                    repaintEatenApple(drawElement, appleCords[0]);
-                    drawElement.repaintUpdatedPoints();
-                });
-
-                if (player.getEatenApples() >= APPLE_EATEN_NEEDS_TO_GROW){
-                    player.increaseLevel();
-                    player.setEatenZero();
-                    player.setSnakeElementsWithCords(snakeLengthen());
-                }
-            } else if (playerLost()){
-                InfoLabel infoLabel = new InfoLabel(drawElement, "/snake/LostLabelImage.png");
-                infoLabel.addLabelToGameScene(gameLayout);
-                player.setActive(false);
-                gameStop();
-            }
-        }));
+        scheduleMove = new Timeline(snakeMoveTask);
         scheduleMove.setCycleCount(Timeline.INDEFINITE);
         scheduleMove.play();
 
@@ -122,19 +94,7 @@ public class GameControl {
                 drawElement.drawPlayer();
             });
             if (eatenApple(player, appleCords[0])){
-                appleCords[0] = drawElement.generateAppleRandomCords();
-                player.setEatenApples(player.getEatenApples() + 1);
-                player.setScore(player.getScore() + SCORE_AMOUNT_AFTER_EATING_APPLE);
-                Platform.runLater(() -> {
-                    repaintEatenApple(drawElement, appleCords[0]);
-                    drawElement.repaintUpdatedPoints();
-                });
-
-                if (player.getEatenApples() >= APPLE_EATEN_NEEDS_TO_GROW){
-                    player.increaseLevel();
-                    player.setEatenZero();
-                    player.setSnakeElementsWithCords(snakeLengthen());
-                }
+                serveEatenAppleAction(player, drawElement, appleCords);
             } else if (playerLost()){
                 InfoLabel infoLabel = new InfoLabel(drawElement, "/snake/LostLabelImage.png");
                 infoLabel.addLabelToGameScene(gameLayout);
@@ -143,6 +103,55 @@ public class GameControl {
             }
         });
 
+    }
+
+    private KeyFrame generateSnakeMoveTask(Snake player, GridPane gameLayout, Draw drawElement, Pair[] appleCords) {
+        KeyFrame snakeMoveTask = new KeyFrame(Duration.millis(periodOfTime), event -> {
+            Platform.runLater(() -> {
+                drawElement.clearSnakeFromGridPane();
+            });
+            player.setSnakeElementsWithCords(generateNewPositionAfterMoveSnake());
+            Platform.runLater(() -> {
+                drawElement.drawPlayer();
+            });
+            if (eatenApple(player, appleCords[0])){
+                serveEatenAppleAction(player, drawElement, appleCords);
+            } else if (playerLost()){
+                InfoLabel infoLabel = new InfoLabel(drawElement, "/snake/LostLabelImage.png");
+                infoLabel.addLabelToGameScene(gameLayout);
+                player.setActive(false);
+                gameStop();
+            }
+        });
+        return snakeMoveTask;
+    }
+
+    private void serveEatenAppleAction(Snake player, Draw drawElement, Pair[] appleCords) {
+        appleCords[0] = drawElement.generateAppleRandomCords();
+        player.setEatenApples(player.getEatenApples() + 1);
+        player.setScore(player.getScore() + SCORE_AMOUNT_AFTER_EATING_APPLE);
+        Platform.runLater(() -> {
+            repaintEatenApple(drawElement, appleCords[0]);
+            drawElement.repaintUpdatedPoints();
+        });
+
+        if (player.getEatenApples() >= APPLE_EATEN_NEEDS_TO_GROW){
+            player.increaseLevel();
+            player.setEatenZero();
+            player.setSnakeElementsWithCords(snakeLengthen());
+            increaseGameSpeed(player, drawElement, appleCords);
+
+        }
+    }
+
+    private void increaseGameSpeed(Snake player, Draw drawElement, Pair[] appleCords) {
+        gameStop();
+        if (periodOfTime != 50) {
+            periodOfTime -= 50;
+        }
+        scheduleMove = new Timeline(generateSnakeMoveTask(player, gameLayout, drawElement, appleCords));
+        scheduleMove.setCycleCount(Timeline.INDEFINITE);
+        gameStart();
     }
 
     public void gameStop(){
