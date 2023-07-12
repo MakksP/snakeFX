@@ -175,14 +175,18 @@ public class Draw {
         }
     }
 
-    public void repaintUpdatedPoints(){
+    public Node findNodeById(String id){
         for (Node node : gameLayout.getChildren()){
             if (node.getId() != null){
-                if (node.getId().equals("SCORE_LABEL")){
-                    ((Label) node).setText("Punkty: " + player.getScore());
-                    return;
+                if (node.getId().equals(id)){
+                    return node;
                 }
             }
         }
+        return null;
+    }
+
+    public void repaintUpdatedPoints(){
+        ((Label) findNodeById("SCORE_LABEL")).setText("Punkty: " + player.getScore());
     }
 }
